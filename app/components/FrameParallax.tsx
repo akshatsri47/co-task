@@ -1,87 +1,70 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
-const LandscapeReveal = () => {
-  const [zoom, setZoom] = useState(1.5);
-  const [yPosition, setYPosition] = useState(-15); // Start positioned to show the mountains
-  const [started, setStarted] = useState(false);
-  
-  useEffect(() => {
-  
-    const timer = setTimeout(() => {
-      setZoom(1.4);
-    }, 800);
-    
-    return () => clearTimeout(timer);
-  }, []);
-  
-  const handleStart = () => {
-    setStarted(true);
-    
-    const duration = 2500;
-    const startTime = Date.now();
-    const startZoom = zoom;
-    const targetZoom = 1;
-    const startPosition = yPosition;
-    const targetPosition = 0;
-    
-    const animate = () => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-    
-      const easing = 1 - Math.pow(1 - progress, 3);
-      
-      const currentZoom = startZoom - (startZoom - targetZoom) * easing;
-      const currentPosition = startPosition - (startPosition - targetPosition) * easing;
-      
-      setZoom(currentZoom);
-      setYPosition(currentPosition);
-      
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      }
-    };
-    
-    requestAnimationFrame(animate);
+const FrameParallax = () => {
+  const [zoomOut, setZoomOut] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  const handleClick = () => {
+    setZoomOut(true);
   };
 
+  useEffect(() => {
+    if (zoomOut) {
+      const scrollDuration = 1000; // matches zoom duration
+      const startTime = performance.now();
+
+      const scrollAnimation = (currentTime) => {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / scrollDuration, 1);
+        
+        // Smooth easing function (ease-out-quad)
+        const easedProgress = progress * (2 - progress);
+        
+        // Scroll by the full viewport height
+        window.scrollTo(0, window.innerHeight * easedProgress);
+        
+        if (progress < 1) {
+          requestAnimationFrame(scrollAnimation);
+        }
+      };
+
+      requestAnimationFrame(scrollAnimation);
+    }
+  }, [zoomOut]);
+
   return (
-    <div className="w-full h-screen relative overflow-hidden bg-gradient-to-b from-blue-200 via-purple-100 to-pink-100">
-     
-      <div 
-        className="absolute inset-0 w-full h-full"
-        style={{ 
-          transform: `scale(${zoom}) translateY(${yPosition}%)`,
-          transformOrigin: "center center",
-          transition: started ? "none" : "transform 800ms ease-out"
-        }}
+    <div className="bg-[url(/vector.png)] bg-no-repeat bg-cover bg-center h-screen w-screen flex items-center justify-center overflow-hidden relative">
+      
+      <div
+        className={`absolute w-full transition-transform duration-1000 ${
+          zoomOut ? "scale-100" : "scale-225"
+        }`}
+      >
+        <img src="/backmoun.svg" className="w-full h-[95vh]" alt="mountain" />
+      </div>
+
+      <div  
+        className={`absolute w-full ${
+          zoomOut ? "bottom-0" : "bottom-[-10%]"
+        } transition-all duration-1000 ${
+          zoomOut ? "scale-100" : "scale-175"
+        }`}
       >
         <img 
-          src="/test.svg" 
-          alt="Mountain landscape scene" 
-          className="w-full h-full object-cover"
+          src="/Foreground.svg" 
+          className="w-full h-full bottom-0 object-bottom object-cover" 
+          alt="forest" 
         />
       </div>
       
-    
-      <div 
-        className="absolute inset-0 flex items-center justify-center z-10 transition-opacity duration-1000"
-        style={{ opacity: started ? 0 : 1, pointerEvents: started ? 'none' : 'auto' }}
+      <button
+        className="absolute text-xl px-6 py-3 bg-white text-black rounded-lg shadow-md font-bold transition-all hover:bg-gray-200"
+        onClick={handleClick}
       >
-        <button
-          onClick={handleStart}
-          className="bg-white bg-opacity-90 hover:bg-opacity-100 text-blue-900 font-bold py-3 px-6 rounded-full shadow-lg transform transition hover:scale-105 focus:outline-none"
-        >
-          START JOURNEY
-        </button>
-      </div>
-      
-     
-      <div className="absolute bottom-4 left-4 flex items-center space-x-2 bg-black bg-opacity-40 text-white text-sm rounded-full px-3 py-1 z-10">
-        <span className="inline-block w-6 h-6 bg-black rounded-md flex items-center justify-center border border-gray-400">N</span>
-        <span>to begin your adventure</span>
-      </div>
+        Click Me
+      </button>
     </div>
   );
 };
 
-export default LandscapeReveal;
+export default FrameParallax;
