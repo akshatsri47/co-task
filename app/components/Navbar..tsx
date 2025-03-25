@@ -13,13 +13,13 @@ const Navbar = () => {
   const supabase = createClient();
   const router = useRouter();
 
-  // Check for user session on load
+ 
   useEffect(() => {
     const getUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setUser(session?.user || null);
       
-      // Set up auth state listener
+     
       const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
         setUser(session?.user || null);
       });
@@ -30,7 +30,7 @@ const Navbar = () => {
     getUser();
   }, [supabase.auth]);
 
-  // Sign-in function
+ 
   const signInWithGoogle = async () => {
     setIsLoading(true);
     try {
@@ -46,7 +46,6 @@ const Navbar = () => {
     }
   };
 
-  // Sign-out function
   const signOut = async () => {
     setIsLoading(true);
     try {
@@ -64,7 +63,10 @@ const Navbar = () => {
       background: 'linear-gradient(to right, #F1CEC7, #7A94DD)'
     }}>
       <div className="flex items-center space-x-12">
-        <a href="#" className="text-white font-medium">FEATURES</a>
+
+       <Link href="/roadmap" className="text-white font-medium">
+  Roadmap
+</Link>
         <a href="#" className="text-white font-medium">ABOUT</a>
         <h1 className="text-xl font-bold text-white mx-6">Co-Task</h1>
       </div>
